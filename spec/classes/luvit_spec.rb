@@ -45,7 +45,7 @@ describe 'luvit' do
     it do
       should contain_file('lum conf dir').with({
         'ensure'    => 'directory',
-        'path'      => '~/.lum',
+        'path'      => '/root/.lum',
       })
     end
 
@@ -54,7 +54,7 @@ describe 'luvit' do
         'cwd'     => '/',
         'path'    => '/bin:/usr/bin',
         'command' => 'echo REPOS=http://lolcathost.org/lum/pancake >> ~/.lum/config',
-        'creates' => '~/.lum/config',
+        'creates' => '/root/.lum/config',
         'require' => 'File[lum conf dir]',
       })
     end

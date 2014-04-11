@@ -60,14 +60,14 @@ class luvit(
 
   file { 'lum conf dir':
     ensure => directory,
-    path   => '~/.lum',
+    path   => '/root/.lum',
   }
 
   exec { 'repo':
     cwd     => '/',
     command => 'echo REPOS=http://lolcathost.org/lum/pancake >> ~/.lum/config',
     path    => '/bin:/usr/bin',
-    creates => '~/.lum/config',
+    creates => '/root/.lum/config',
     require => File['lum conf dir'],
   }
 
