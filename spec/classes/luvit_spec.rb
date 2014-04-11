@@ -38,7 +38,7 @@ describe 'luvit' do
         'path'    => '/bin:/usr/bin',
         'command' => 'make && make install',
         'creates' => '/usr/local/bin/luvit',
-        'require' => 'Package[gcc, make]',
+        'require' => ['Package[gcc]', 'Package[make]'],
       })
     end
 
