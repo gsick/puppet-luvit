@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/gsick/puppet-luvit.svg?branch=master)](https://travis-ci.org/gsick/puppet-luvit)
 [![Coverage Status](https://coveralls.io/repos/gsick/puppet-luvit/badge.png?branch=master)](https://coveralls.io/r/gsick/puppet-luvit?branch=master)
-(95% with rspec-puppet)
+(100% with rspec-puppet)
 
 puppet-luvit
 ============

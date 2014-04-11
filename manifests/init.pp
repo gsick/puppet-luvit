@@ -31,7 +31,7 @@ class luvit(
   $tmp                    = hiera('luvit::tmp', '/tmp'),
 ) {
 
-  singleton_packages('gcc', 'make', 'wget')
+  singleton_packages('gcc', 'make', 'wget', 'git')
 
   exec { 'download luvit':
     cwd     => $tmp,
@@ -56,5 +56,35 @@ class luvit(
     path    => '/bin:/usr/bin',
     creates => '/usr/local/bin/luvit',
     require => Package['gcc', 'make'],
+  }
+
+  file { 'lum conf dir':
+    ensure => directory,
+    path   => '~/.lum',
+  }
+
+  exec { 'repo':
+    cwd     => '/',
+    command => 'echo REPOS=http://lolcathost.org/lum/pancake >> ~/.lum/config',
+    path    => '/bin:/usr/bin',
+    creates => '~/.lum/config',
+    require => File['lum conf dir'],
+  }
+
+  exec { 'download lum':
+    cwd     => $tmp,
+    path    => '/bin:/usr/bin',
+    command => 'git clone https://github.com/radare/lum.git',
+    creates => "${tmp}/lum/Makefile",
+    notify  => Exec['install lum'],
+    require => Package['git'],
+  }
+
+  exec { 'install lum':
+    cwd     => "${tmp}/lum",
+    path    => '/bin:/usr/bin',
+    command => 'make install',
+    creates => '/usr/bin/lum',
+    require => Package['make'],
   }
 }
