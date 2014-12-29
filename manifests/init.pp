@@ -46,7 +46,5 @@ class luvit(
     creates => '/usr/local/bin/luvit',
     require => Package['gcc'],
   }
-  ->
-  ensure_packages(['gcc'], {'ensure' => 'absent' })
 
 }
