@@ -43,7 +43,7 @@ class luvit(
                 && rm -f luvit.tar.gz \
                 && make -C /usr/src/luvit \
                 && make -C /usr/src/luvit install \
-                && rm -r /usr/src/luvit",
+                && rm -rf /usr/src/luvit",
     creates => '/usr/local/bin/luvit',
     require => Package['gcc'],
   }
@@ -70,9 +70,8 @@ class luvit(
       cwd     => $tmp,
       path    => '/bin:/usr/bin',
       command => "cd /usr/src && git clone https://github.com/radare/lum.git \
-                  && make -C /usr/src/lum \
                   && make -C /usr/src/lum install \
-                  && cd && rm -r /usr/src/lum",
+                  && rm -rf /usr/src/lum",
       creates => '/usr/bin/lum',
       require => Package['git'],
     }
