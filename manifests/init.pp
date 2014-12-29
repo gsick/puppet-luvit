@@ -69,8 +69,7 @@ class luvit(
     exec { 'install lum':
       cwd     => $tmp,
       path    => '/bin:/usr/bin',
-      command => "mkdir -p /usr/src/lum \
-                  && cd /usr/src/lum && git clone https://github.com/radare/lum.git \
+      command => "cd /usr/src && git clone https://github.com/radare/lum.git \
                   && make -C /usr/src/lum \
                   && make -C /usr/src/lum install \
                   && cd && rm -r /usr/src/lum",
