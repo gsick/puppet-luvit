@@ -28,7 +28,8 @@
 #
 class luvit(
   $version,
-  $tmp     = '/tmp',
+  $install_lum = true,
+  $tmp         = '/tmp',
 ) {
 
   ensure_packages(['gcc'])
@@ -47,4 +48,34 @@ class luvit(
     require => Package['gcc'],
   }
 
+  # TODO remove gcc
+
+  if($install_lum) {
+    ensure_packages(['git'])
+
+    file { 'lum conf dir':
+      ensure => directory,
+      path   => '/root/.lum',
+    }
+
+    exec { 'repo':
+      cwd     => '/',
+      command => 'echo REPOS=http://lolcathost.org/lum/pancake >> ~/.lum/config',
+      path    => '/bin:/usr/bin',
+      creates => '/root/.lum/config',
+      require => File['lum conf dir'],
+    }
+
+    exec { 'install lum':
+      cwd     => $tmp,
+      path    => '/bin:/usr/bin',
+      command => "mkdir -p /usr/src/lum \
+                  && cd /usr/src/lum && git clone https://github.com/radare/lum.git \
+                  && make -C /usr/src/lum \
+                  && make -C /usr/src/lum install \
+                  && cd && rm -r /usr/src/lum",
+      creates => '/usr/bin/lum',
+      require => Package['git'],
+    }
+  }
 }
