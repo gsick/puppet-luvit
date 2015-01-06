@@ -28,7 +28,7 @@
 #
 class luvit(
   $version,
-  $install_lum = true,
+  $install_lum = false,
   $tmp         = '/tmp',
 ) {
 
