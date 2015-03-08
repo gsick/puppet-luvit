@@ -32,7 +32,7 @@ class luvit(
   $tmp         = '/tmp',
 ) {
 
-  ensure_packages(['gcc'])
+  ensure_packages(['gcc', 'libuv'])
 
   exec { 'install luvit':
     cwd     => $tmp,
