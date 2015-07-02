@@ -4,7 +4,7 @@
 #
 # == Parameters:
 #
-# $version:: The version of Luvit to download.
+# $master:: Last version or master branch.
 #
 # $tmp::  Temp directory.
 #
@@ -15,7 +15,7 @@
 # == Sample Usage:
 #
 #   class {'luvit':
-#     version => '0.8.2',
+#
 #   }
 #
 # == Authors
@@ -24,56 +24,67 @@
 #
 # == Copyright
 #
-# Copyright 2014 Gamaliel Sick, unless otherwise noted.
+# Copyright 2015 Gamaliel Sick, unless otherwise noted.
 #
 class luvit(
-  $version,
-  $install_lum = false,
-  $tmp         = '/tmp',
+  $master = false,
+  $tmp    = '/tmp',
 ) {
 
-  ensure_packages(['gcc', 'libuv', 'c-ares', 'c-ares-devel'])
+  validate_bool($master)
+  validate_absolute_path($tmp)
+
+  ensure_packages(['curl'])
+
+  # Install lit
+  exec { 'download lit script':
+    cwd     => $tmp,
+    path    => '/bin:/usr/bin',
+    command => "curl -L https://github.com/luvit/lit/raw/master/get-lit.sh -o get-lit.sh \
+                && chmod +x get-lit.sh",
+    creates => "${tmp}/get-lit.sh",
+    require => Package['curl'],
+  }
+
+  exec { 'build lit':
+    cwd     => $tmp,
+    path    => '/bin:/usr/bin',
+    command => './get-lit.sh',
+    creates => ["${tmp}/lit", "${tmp}/luvi"],
+    require => Exec['download lit script'],
+  }
+
+  exec { 'install lit':
+    cwd     => $tmp,
+    path    => '/bin:/usr/bin',
+    command => 'cp lit /usr/local/bin \
+                && cp luvi /usr/local/bin \
+                && ln -s /usr/local/bin/lit /bin/lit \
+                && ln -s /usr/local/bin/luvi /bin/luvi',
+    creates => ['/bin/lit', '/bin/luvi'],
+    require => Exec['build lit'],
+  }
+
+  # Install Luvit
+  $command = $master ? {
+    true    => 'lit make github://luvit/luvit',
+    default => 'lit make lit://luvit/luvit'
+  }
+
+  exec { 'build luvit':
+    cwd     => $tmp,
+    path    => '/bin:/usr/bin',
+    command => $command,
+    creates => "${tmp}/luvit",
+    require => Exec['install lit'],
+  }
 
   exec { 'install luvit':
     cwd     => $tmp,
     path    => '/bin:/usr/bin',
-    command => "mkdir -p /usr/src/luvit \
-                && curl -sSL \"http://luvit.io/dist/latest/luvit-${version}.tar.gz\" -o luvit.tar.gz \
-                && tar -xzf luvit.tar.gz -C /usr/src/luvit --strip-components=1 \
-                && rm -f luvit.tar.gz \
-                && make -C /usr/src/luvit \
-                && make -C /usr/src/luvit install \
-                && rm -rf /usr/src/luvit",
-    creates => '/usr/local/bin/luvit',
-    require => Package['gcc'],
-  }
-
-  # TODO remove gcc
-
-  if($install_lum) {
-    ensure_packages(['git'])
-
-    file { 'lum conf dir':
-      ensure => directory,
-      path   => '/root/.lum',
-    }
-
-    exec { 'repo':
-      cwd     => '/',
-      command => 'echo REPOS=http://lolcathost.org/lum/pancake >> ~/.lum/config',
-      path    => '/bin:/usr/bin',
-      creates => '/root/.lum/config',
-      require => File['lum conf dir'],
-    }
-
-    exec { 'install lum':
-      cwd     => $tmp,
-      path    => '/bin:/usr/bin',
-      command => "cd /usr/src && git clone https://github.com/radare/lum.git \
-                  && make -C /usr/src/lum install \
-                  && rm -rf /usr/src/lum",
-      creates => '/usr/bin/lum',
-      require => Package['git'],
-    }
+    command => 'cp luvit /usr/local/bin \
+                && ln -s /usr/local/bin/luvit /bin/luvit',
+    creates => '/bin/luvit',
+    require => Exec['build luvit'],
   }
 }
