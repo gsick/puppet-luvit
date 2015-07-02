@@ -49,7 +49,7 @@ class luvit(
   exec { 'build lit':
     cwd     => $tmp,
     path    => '/bin:/usr/bin',
-    command => "${tmp}/get-lit.sh",
+    command => "HOME=/root ${tmp}/get-lit.sh",
     creates => ["${tmp}/lit", "${tmp}/luvi"],
     require => Exec['download lit script'],
   }
