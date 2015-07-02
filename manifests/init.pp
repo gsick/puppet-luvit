@@ -67,8 +67,8 @@ class luvit(
 
   # Install Luvit
   $command = $master ? {
-    true    => 'lit make github://luvit/luvit',
-    default => 'lit make lit://luvit/luvit'
+    true    => 'HOME=/root lit make github://luvit/luvit',
+    default => 'HOME=/root lit make lit://luvit/luvit'
   }
 
   exec { 'build luvit':
