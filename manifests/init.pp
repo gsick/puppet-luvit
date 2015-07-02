@@ -47,11 +47,12 @@ class luvit(
   }
 
   exec { 'build lit':
-    cwd     => $tmp,
-    path    => '/bin:/usr/bin',
-    command => "HOME=/root ${tmp}/get-lit.sh",
-    creates => ["${tmp}/lit", "${tmp}/luvi"],
-    require => Exec['download lit script'],
+    cwd         => $tmp,
+    path        => '/bin:/usr/bin',
+    environment => ["HOME=/root"],
+    command     => "${tmp}/get-lit.sh",
+    creates     => ["${tmp}/lit", "${tmp}/luvi"],
+    require     => Exec['download lit script'],
   }
 
   exec { 'install lit':
@@ -67,16 +68,17 @@ class luvit(
 
   # Install Luvit
   $command = $master ? {
-    true    => 'HOME=/root lit make github://luvit/luvit',
-    default => 'HOME=/root lit make lit://luvit/luvit'
+    true    => 'lit make github://luvit/luvit',
+    default => 'lit make lit://luvit/luvit'
   }
 
   exec { 'build luvit':
-    cwd     => $tmp,
-    path    => '/bin:/usr/bin',
-    command => $command,
-    creates => "${tmp}/luvit",
-    require => Exec['install lit'],
+    cwd         => $tmp,
+    path        => '/bin:/usr/bin',
+    environment => ["HOME=/root"],
+    command     => $command,
+    creates     => "${tmp}/luvit",
+    require     => Exec['install lit'],
   }
 
   exec { 'install luvit':
